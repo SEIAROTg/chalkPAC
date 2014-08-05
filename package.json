@@ -1,6 +1,7 @@
 {
-	"name": "chalkPAC",
+	"name": "chalk-pac",
 	"version": "0.1.0",
+	"author": "seiarotg",
 	"description": "Proxy auto config generator",
 	"keywords": [
 		"pac",
