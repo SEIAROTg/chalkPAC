@@ -78,5 +78,5 @@ A region code stands for its IP Address
 
 * Only Asia Pacific regions are supported currently
 
-[NPM]:			https://www.npmjs.org/package/chalk-pac
-[NPM IMAGE]:	http://img.shields.io/npm/v/chalk-pac.svg
+[NPM]:          https://www.npmjs.org/package/chalk-pac
+[NPM IMAGE]:    http://img.shields.io/npm/v/chalk-pac.svg
