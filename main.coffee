@@ -72,15 +72,37 @@ http.get urlList, (res) ->
 		routeList = []
 		regionNum = 0
 		theRegion = undefined
+		configWithoutDefault = {}
+
 		for region, proxy of config when region isnt 'default'
+
 			++regionNum
 			theRegion = region
-			patten = new RegExp "^apnic\\|#{region}\\|ipv4\\|(\\d*)\\.(\\d*)\\.(\\d*)\\.(\\d*)\\|(\\d*)\\|\\d*\\|.*?$", 'img'
-			while result = patten.exec responseText
-				routeList.push
-					ip: ((result[1] << 24) | (result[2] << 16) | (result[3] << 8) | (result[4])) >>> 0
-					mask: Math.log(result[5]) / Math.LN2
-					region: region
+			configWithoutDefault[region] = proxy
+
+			if region == 'private'
+
+				# RFC 1918 Section 3
+				# Private IP Address
+				# http://tools.ietf.org/html/rfc1918#section-3
+
+				routeList.push [
+					# 10/8
+					{ ip: 0x0A000000, mask: 8, region: region }
+					# 172.16/12
+					{ ip: 0xAC100000, mask: 12, region: region }
+					# 192.168/16
+					{ ip: 0xC0A80000, mask: 16, region: region }
+				]...
+
+			else
+
+				patten = new RegExp "^apnic\\|#{region}\\|ipv4\\|(\\d*)\\.(\\d*)\\.(\\d*)\\.(\\d*)\\|(\\d*)\\|\\d*\\|.*?$", 'img'
+				while result = patten.exec responseText
+					routeList.push
+						ip: ((result[1] << 24) | (result[2] << 16) | (result[3] << 8) | (result[4])) >>> 0
+						mask: Math.log(result[5]) / Math.LN2
+						region: region
 
 		routeList.sort (a, b) -> a.ip - b.ip
 
@@ -101,8 +123,8 @@ http.get urlList, (res) ->
 				listCode += ';'
 				regionCode = "function g(){return \"#{config[theRegion]}\"}"
 			else
-				listCode += ",r=#{JSON.stringify(regionList)};"
-				regionCode = 'function g(n){return r[n]}'
+				listCode += ",r=#{JSON.stringify(regionList)},c=#{JSON.stringify(configWithoutDefault)};"
+				regionCode = 'function g(n){return c[r[n]]}'
 			bsearchCode = 'function b(t){var l=0,r=i.length,m;while(l+1<r){m=parseInt((l+r)/2);if(t>i[m])l=m;else r=m}return l}'
 			mainCode = "function FindProxyForURL(url,host){var p=dnsResolve(host).match(/(\\d*)\\.(\\d*)\\.(\\d*)\\.(\\d*)/),q=(p[1]<<24|p[2]<<16|p[3]<<8|p[4])>>>0;if((n=b(q))&&(i[n]&q&0xffffffff<<m[n])>>>0==i[n])return g(n);else return \"#{config.default}\"}" 
 			code = listCode + regionCode + bsearchCode + mainCode
