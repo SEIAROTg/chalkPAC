@@ -1,8 +1,7 @@
 {
 	"proxy": {
 		"direct": "DIRECT",
-		"socks5": "SOCKS5 127.0.0.1:1080",
-		"": ""
+		"socks5": "SOCKS5 127.0.0.1:1080"
 	},
 	"route": {
 		"private": "direct",
