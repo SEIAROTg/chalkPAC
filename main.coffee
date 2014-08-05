@@ -39,8 +39,8 @@ try
 catch
 	abort 'Config is not valid JSON'
 
-if not config.default?
-	abort 'Default proxy not specified'
+if not config.route.default?
+	abort 'Default route not specified'
 
 
 # Downloading IP List
@@ -70,15 +70,11 @@ http.get urlList, (res) ->
 		newStatus 'Arranging data'
 
 		routeList = []
-		regionNum = 0
 		theRegion = undefined
-		configWithoutDefault = {}
 
-		for region, proxy of config when region isnt 'default'
+		for region, proxy of config.route when region isnt 'default'
 
-			++regionNum
 			theRegion = region
-			configWithoutDefault[region] = proxy
 
 			if region == 'private'
 
@@ -88,11 +84,11 @@ http.get urlList, (res) ->
 
 				routeList.push [
 					# 10/8
-					{ ip: 0x0A000000, mask: 8, region: region }
+					{ ip: 0x0A000000, mask: 8, proxy: proxy }
 					# 172.16/12
-					{ ip: 0xAC100000, mask: 12, region: region }
+					{ ip: 0xAC100000, mask: 12, proxy: proxy }
 					# 192.168/16
-					{ ip: 0xC0A80000, mask: 16, region: region }
+					{ ip: 0xC0A80000, mask: 16, proxy: proxy }
 				]...
 
 			else
@@ -102,31 +98,43 @@ http.get urlList, (res) ->
 					routeList.push
 						ip: ((result[1] << 24) | (result[2] << 16) | (result[3] << 8) | (result[4])) >>> 0
 						mask: Math.log(result[5]) / Math.LN2
-						region: region
+						proxy: proxy
 
 		routeList.sort (a, b) -> a.ip - b.ip
 
 		ipList = []
 		maskList = []
-		regionList = []
+		proxyList = []
 
 		for route in routeList
 			ipList.push route.ip
 			maskList.push route.mask
-			regionList.push route.region
+			proxyList.push route.proxy
 
-		if regionNum == 0
-			code = "function FindProxyForURL(){return \"#{config.default}\"}"
+		theProxy = undefined
+		nonDefault = undefined
+		theDefault = undefined
+		proxyNum = 0
+		for name, proxy of config.proxy
+			++proxyNum
+			theProxy = proxy
+			if name == config.route.default
+				theDefault = proxy
+			else
+				nonDefault = proxy
+
+		if proxyNum == 1
+			code = "function FindProxyForURL(){return \"#{theProxy}\"}"
 		else
 			listCode = "var i=#{JSON.stringify(ipList)},m=#{JSON.stringify(maskList)}"
-			if regionNum == 1
+			if proxyNum == 2
 				listCode += ';'
-				regionCode = "function g(){return \"#{config[theRegion]}\"}"
+				regionCode = "function g(){return \"#{nonDefault}\"}"
 			else
-				listCode += ",r=#{JSON.stringify(regionList)},c=#{JSON.stringify(configWithoutDefault)};"
+				listCode += ",r=#{JSON.stringify(proxyList)},c=#{JSON.stringify(config.proxy)};"
 				regionCode = 'function g(n){return c[r[n]]}'
 			bsearchCode = 'function b(t){var l=0,r=i.length,m;while(l+1<r){m=parseInt((l+r)/2);if(t>i[m])l=m;else r=m}return l}'
-			mainCode = "function FindProxyForURL(url,host){var p=dnsResolve(host).match(/(\\d*)\\.(\\d*)\\.(\\d*)\\.(\\d*)/),q=(p[1]<<24|p[2]<<16|p[3]<<8|p[4])>>>0;if((n=b(q))&&(i[n]&q&0xffffffff<<m[n])>>>0==i[n])return g(n);else return \"#{config.default}\"}" 
+			mainCode = "function FindProxyForURL(url,host){var p=dnsResolve(host).match(/(\\d*)\\.(\\d*)\\.(\\d*)\\.(\\d*)/),q=(p[1]<<24|p[2]<<16|p[3]<<8|p[4])>>>0;if((n=b(q))&&(i[n]&q&0xffffffff<<m[n])>>>0==i[n])return g(n);else return \"#{theDefault}\"}" 
 			code = listCode + regionCode + bsearchCode + mainCode
 
 		fs.writeFileSync 'proxy.pac', code

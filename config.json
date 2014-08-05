@@ -1,5 +1,12 @@
 {
-	"private": "DIRECT",
-	"CN": "DIRECT",
-	"default": "SOCKS5 127.0.0.1:1080"
+	"proxy": {
+		"direct": "DIRECT",
+		"socks5": "SOCKS5 127.0.0.1:1080",
+		"": ""
+	},
+	"route": {
+		"private": "direct",
+		"CN": "direct",
+		"default": "socks5"
+	}
 }
