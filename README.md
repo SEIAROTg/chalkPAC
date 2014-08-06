@@ -56,13 +56,13 @@ the value is PAC proxy string
 
 `route` defines a list of proxy rule with key & value
 
-the key can be `"private"`, `"default"` or region code
+the key can be `"special"`, `"default"` or region code
 
 the value is a proxy name defined in `proxy`
 
-#### "private"
+#### "special"
 
-`"private"` stands for Private IP Address ([RFC 1918](http://tools.ietf.org/html/rfc1918#section-3))
+`"special"` stands for special use IP addresses ([RFC 5375](http://tools.ietf.org/html/rfc5735))
 
 #### "default"
 
