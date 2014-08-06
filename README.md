@@ -36,7 +36,7 @@ chalkPAC configuration is stored in `config.json` like the following:
     		"socks5": "SOCKS5 127.0.0.1:1080"
     	},
     	"route": {
-    		"private": "direct",
+    		"special": "direct",
     		"CN": "direct",
     		"default": "socks5"
     	}
