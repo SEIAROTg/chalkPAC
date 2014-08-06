@@ -110,11 +110,6 @@ http.get urlList, (res) ->
 		maskList = []
 		proxyList = []
 
-		for route in routeList
-			ipList.push route.ip
-			maskList.push route.mask
-			proxyList.push route.proxy
-
 		theProxy = undefined
 		nonDefault = undefined
 		theDefault = undefined
@@ -126,6 +121,12 @@ http.get urlList, (res) ->
 				theDefault = proxy
 			else
 				nonDefault = proxy
+
+		for route in routeList
+			if config.proxy[route.proxy] isnt theDefault
+				ipList.push route.ip
+				maskList.push route.mask
+				proxyList.push route.proxy
 
 		if proxyNum == 1
 			code = "function FindProxyForURL(){return \"#{theProxy}\"}"

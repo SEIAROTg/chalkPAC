@@ -70,19 +70,47 @@
           continue;
         }
         theRegion = region;
-        if (region === 'private') {
+        if (region === 'special') {
           routeList.push.apply(routeList, [
             {
+              ip: 0x00000000,
+              mask: 8,
+              proxy: proxy
+            }, {
               ip: 0x0A000000,
               mask: 8,
+              proxy: proxy
+            }, {
+              ip: 0x7f000000,
+              mask: 8,
+              proxy: proxy
+            }, {
+              ip: 0xA9FE0000,
+              mask: 16,
               proxy: proxy
             }, {
               ip: 0xAC100000,
               mask: 12,
               proxy: proxy
             }, {
+              ip: 0xC0000000,
+              mask: 24,
+              proxy: proxy
+            }, {
+              ip: 0xC0000200,
+              mask: 24,
+              proxy: proxy
+            }, {
+              ip: 0xC0586300,
+              mask: 24,
+              proxy: proxy
+            }, {
               ip: 0xC0A80000,
               mask: 16,
+              proxy: proxy
+            }, {
+              ip: 0xC6120000,
+              mask: 15,
               proxy: proxy
             }
           ]);
@@ -103,12 +131,6 @@
       ipList = [];
       maskList = [];
       proxyList = [];
-      for (_i = 0, _len = routeList.length; _i < _len; _i++) {
-        route = routeList[_i];
-        ipList.push(route.ip);
-        maskList.push(route.mask);
-        proxyList.push(route.proxy);
-      }
       theProxy = void 0;
       nonDefault = void 0;
       theDefault = void 0;
@@ -122,6 +144,14 @@
           theDefault = proxy;
         } else {
           nonDefault = proxy;
+        }
+      }
+      for (_i = 0, _len = routeList.length; _i < _len; _i++) {
+        route = routeList[_i];
+        if (config.proxy[route.proxy] !== theDefault) {
+          ipList.push(route.ip);
+          maskList.push(route.mask);
+          proxyList.push(route.proxy);
         }
       }
       if (proxyNum === 1) {
