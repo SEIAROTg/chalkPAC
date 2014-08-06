@@ -83,6 +83,8 @@ http.get urlList, (res) ->
 				# http://tools.ietf.org/html/rfc1918#section-3
 
 				routeList.push [
+					# 127/8
+					{ ip: 0x7f000000, mask: 8, proxy: proxy}
 					# 10/8
 					{ ip: 0x0A000000, mask: 8, proxy: proxy }
 					# 172.16/12
