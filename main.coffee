@@ -76,21 +76,23 @@ http.get urlList, (res) ->
 
 			theRegion = region
 
-			if region == 'private'
+			if region == 'special'
 
-				# RFC 1918 Section 3
-				# Private IP Address
-				# http://tools.ietf.org/html/rfc1918#section-3
+				# RFC 5735
+				# Special Use IPv4 Addresses
+				# http://tools.ietf.org/html/rfc5735
 
 				routeList.push [
-					# 127/8
-					{ ip: 0x7f000000, mask: 8, proxy: proxy}
-					# 10/8
-					{ ip: 0x0A000000, mask: 8, proxy: proxy }
-					# 172.16/12
-					{ ip: 0xAC100000, mask: 12, proxy: proxy }
-					# 192.168/16
-					{ ip: 0xC0A80000, mask: 16, proxy: proxy }
+					{ ip: 0x00000000, mask: 8, proxy: proxy } # 0/8
+					{ ip: 0x0A000000, mask: 8, proxy: proxy } # 10/8
+					{ ip: 0x7f000000, mask: 8, proxy: proxy } # 127/8
+					{ ip: 0xA9FE0000, mask: 16, proxy: proxy } # 169.254/16
+					{ ip: 0xAC100000, mask: 12, proxy: proxy } # 172.16/12
+					{ ip: 0xC0000000, mask: 24, proxy: proxy } # 192.0.0/24
+					{ ip: 0xC0000200, mask: 24, proxy: proxy } # 192.0.2/24
+					{ ip: 0xC0586300, mask: 24, proxy: proxy } # 192.88.99/24
+					{ ip: 0xC0A80000, mask: 16, proxy: proxy } # 192.168/16
+					{ ip: 0xC6120000, mask: 15, proxy: proxy }# 198.18/15
 				]...
 
 			else
