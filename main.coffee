@@ -83,16 +83,16 @@ http.get urlList, (res) ->
 				# http://tools.ietf.org/html/rfc5735
 
 				routeList.push [
-					{ ip: 0x00000000, mask: 8, proxy: proxy } # 0/8
-					{ ip: 0x0A000000, mask: 8, proxy: proxy } # 10/8
-					{ ip: 0x7f000000, mask: 8, proxy: proxy } # 127/8
+					{ ip: 0x00000000, mask: 24, proxy: proxy } # 0/8
+					{ ip: 0x0A000000, mask: 24, proxy: proxy } # 10/8
+					{ ip: 0x7f000000, mask: 24, proxy: proxy } # 127/8
 					{ ip: 0xA9FE0000, mask: 16, proxy: proxy } # 169.254/16
-					{ ip: 0xAC100000, mask: 12, proxy: proxy } # 172.16/12
-					{ ip: 0xC0000000, mask: 24, proxy: proxy } # 192.0.0/24
-					{ ip: 0xC0000200, mask: 24, proxy: proxy } # 192.0.2/24
-					{ ip: 0xC0586300, mask: 24, proxy: proxy } # 192.88.99/24
+					{ ip: 0xAC100000, mask: 20, proxy: proxy } # 172.16/12
+					{ ip: 0xC0000000, mask:  8, proxy: proxy } # 192.0.0/24
+					{ ip: 0xC0000200, mask:  8, proxy: proxy } # 192.0.2/24
+					{ ip: 0xC0586300, mask:  8, proxy: proxy } # 192.88.99/24
 					{ ip: 0xC0A80000, mask: 16, proxy: proxy } # 192.168/16
-					{ ip: 0xC6120000, mask: 15, proxy: proxy }# 198.18/15
+					{ ip: 0xC6120000, mask: 17, proxy: proxy } # 198.18/15
 				]...
 
 			else
@@ -139,7 +139,7 @@ http.get urlList, (res) ->
 				listCode += ",r=#{JSON.stringify(proxyList)},c=#{JSON.stringify(config.proxy)};"
 				regionCode = 'function g(n){return c[r[n]]}'
 			bsearchCode = 'function b(t){var l=0,r=i.length,m;while(l+1<r){m=parseInt((l+r)/2);if(t>i[m])l=m;else r=m}return l}'
-			mainCode = "function FindProxyForURL(url,host){var p=dnsResolve(host).match(/(\\d*)\\.(\\d*)\\.(\\d*)\\.(\\d*)/),q=(p[1]<<24|p[2]<<16|p[3]<<8|p[4])>>>0;if((n=b(q))&&(i[n]&q&0xffffffff<<m[n])>>>0==i[n])return g(n);else return \"#{theDefault}\"}" 
+			mainCode = "function FindProxyForURL(url,host){var p=dnsResolve(host).match(/(\\d*)\\.(\\d*)\\.(\\d*)\\.(\\d*)/),q=(p[1]<<24|p[2]<<16|p[3]<<8|p[4])>>>0;if((n=b(q))&&i[n]>>>m[n]==q>>>m[n])return g(n);else return \"#{theDefault}\"}" 
 			code = listCode + regionCode + bsearchCode + mainCode
 
 		fs.writeFileSync 'proxy.pac', code
